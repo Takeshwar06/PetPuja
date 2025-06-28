@@ -1,0 +1,92 @@
+import { View, Text } from 'react-native';
+import React from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import CustomerLoginScreen from '../screens/CustomerLoginScreen';
+import DeliveryLoginScreen from '../screens/delivery/DeliveryLoginScreen';
+import OrderDetailScreen from '../screens/OrderDetailScreen';
+import ProductDetailScreen from '../screens/ProductDetailScreen';
+import SearchScreen from '../screens/SearchScreen';
+import BottomTabNavigation from './BottomTabNavigation';
+import DeliveryPortalScreen from '../screens/delivery/DeliveryPortalScreen';
+import AddProductScreen from '../screens/delivery/AddProductScreen';
+import SplashScreen from '../screens/starter/SplashScreen';
+import EngageScreen1 from '../screens/starter/EngageScreen1';
+import EngageScreen2 from '../screens/starter/EngageScreen2';
+import EngageScreen3 from '../screens/starter/EngageScreen3';
+
+const Stack = createNativeStackNavigator();
+export default function StackNavigation() {
+  //   Splash
+  //   Engage1
+  //   Engage2
+  //   Engage3
+  //   Clogin
+  //   Dlogin
+  //   OrderDetailScreen
+  //   productdetailsScreen
+  //   SearchScreen
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="SplashScreen"
+        component={SplashScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EngageScreen1"
+        component={EngageScreen1}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EngageScreen2"
+        component={EngageScreen2}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EngageScreen3"
+        component={EngageScreen3}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CustomerLoginScreen"
+        component={CustomerLoginScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="DeliveryLoginScreen"
+        component={DeliveryLoginScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="DeliveryPortalScreen"
+        component={DeliveryPortalScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="AddProductScreen"
+        component={AddProductScreen}
+        options={{ headerShown: true, title: "Add Product" }}
+      />
+      <Stack.Screen
+        name="OrderDetailScreen"
+        component={OrderDetailScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ProductDetailScreen"
+        component={ProductDetailScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="SearchScreen"
+        component={SearchScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="BottomTabNavigation"
+        component={BottomTabNavigation}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+}
