@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,11 +8,15 @@ import {
   SafeAreaView,
   StatusBar,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import { Colors } from '../../utils/Constants';
 import { DiamondPlus, LogOut, NotebookPen } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { host } from '../../services/api';
+import FullLoader from '../../components/FullLoader';
 
 const dummyOrders = [
   {
@@ -35,9 +39,51 @@ const dummyOrders = [
 
 export default function DeliveryPortalScreen() {
   const navigation = useNavigation();
-  const handleAccept = orderId => {
-    console.log(`Accepted order ${orderId}`);
-    // Here you would update the order status or navigate
+  const [orders, setOrders] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const fetchOrders = async () => {
+    try {
+      setRefreshing(true);
+      const response = await axios.get(`${host}/api/v1/orders/for-delivery`);
+      console.log(response);
+      setOrders(response.data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const handleAccept = async orderId => {
+    try {
+      setLoading(true);
+      const deliveryPartner = await AsyncStorage.getItem('deliveryPartner');
+      await axios.put(`${host}/api/v1/orders/accept`, {
+        orderId,
+        deleveryPartner: deliveryPartner,
+      });
+      const dummyOrder = [...orders];
+      const index = dummyOrder.findIndex(order => order._id === orderId);
+      if (index !== -1) {
+        dummyOrder[index].status = 'accept';
+        dummyOrder[index].deleveryPartner = deliveryPartner; // Replace with actual delivery partner name
+        setOrders(dummyOrder);
+      }
+    } catch (error) {
+      console.log(error);
+      Alert.alert(
+        'Error',
+        error?.response?.data?.message ||
+          'Failed to accept the order. Please try again.',
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleLogout = () => {
@@ -60,30 +106,44 @@ export default function DeliveryPortalScreen() {
       },
     ]);
   };
+
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <View style={styles.rowBetween}>
-        <Text style={styles.orderId}>{item.orderId}</Text>
+        <Text style={styles.orderId}>{item._id}</Text>
         <Text style={styles.status}>{item.status}</Text>
       </View>
-      <Text style={styles.info}>Date: {item.date}</Text>
-      <Text style={styles.info}>Mobile: {item.userMobile}</Text>
-      <Text style={styles.info}>Items: {item.items}</Text>
+      <Text style={styles.info}>Date: {item.createdAt?.substring(0, 10)}</Text>
+      <Text style={styles.info}>Mobile: {item.user}</Text>
+      <Text style={styles.info}>Items: {item.items?.length}</Text>
       <Text style={styles.info}>Total: {item.totalAmount}</Text>
 
-      <TouchableOpacity
-        activeOpacity={0.8}
-        style={styles.acceptButton}
-        onPress={() => handleAccept(item.orderId)}
-      >
-        <Text style={styles.acceptText}>Accept</Text>
-      </TouchableOpacity>
+      {item.deleveryPartner ? (
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={[styles.acceptButton, { backgroundColor: Colors.secondary }]}
+          onPress={() =>
+            navigation.navigate('OrderDetailScreen', { order: item })
+          }
+        >
+          <Text style={styles.acceptText}>go to delivery</Text>
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={styles.acceptButton}
+          onPress={() => handleAccept(item._id)}
+        >
+          <Text style={styles.acceptText}>Accept</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
+      {loading && <FullLoader loading={loading} />}
       <View
         style={{
           paddingHorizontal: 16,
@@ -99,7 +159,7 @@ export default function DeliveryPortalScreen() {
           <DiamondPlus />
           <Text>Add</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={{ alignItems: 'center' }}>
+        <TouchableOpacity onPress={() => navigation.navigate("MyDeliveryScreen")} style={{ alignItems: 'center' }}>
           <NotebookPen />
           <Text>My Delivery</Text>
         </TouchableOpacity>
@@ -112,7 +172,10 @@ export default function DeliveryPortalScreen() {
         </TouchableOpacity>
       </View>
       <FlatList
-        data={dummyOrders}
+        data={orders}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={fetchOrders} />
+        }
         keyExtractor={item => item.orderId}
         renderItem={renderItem}
         contentContainerStyle={styles.list}

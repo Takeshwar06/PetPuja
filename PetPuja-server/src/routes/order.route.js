@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  acceptOrder,
   createOrder,
   getDeliveryPartnerOrders,
   getOrderById,
@@ -7,6 +8,7 @@ import {
   getOrdersForDelivery,
   getUserOrders,
   updateOrderStatus,
+  verifyOrder,
 } from "../controllers/order.controller.js";
 const router = express.Router();
 
@@ -14,11 +16,13 @@ const router = express.Router();
 
 router.post("/", createOrder);
 router.get("/", getOrders);
-router.get("/:orderId", getOrderById);
 router.get("/for-delivery", getOrdersForDelivery);
 router.post("/user", getUserOrders);
 router.post("/delivery-partner", getDeliveryPartnerOrders);
+router.put("/accept", acceptOrder);
 router.put("/status", updateOrderStatus);
+router.put("/:orderId/verify",verifyOrder);
+router.get("/:orderId", getOrderById);
 
 // Export the router
 export default router;

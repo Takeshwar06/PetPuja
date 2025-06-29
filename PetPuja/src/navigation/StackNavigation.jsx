@@ -13,6 +13,7 @@ import SplashScreen from '../screens/starter/SplashScreen';
 import EngageScreen1 from '../screens/starter/EngageScreen1';
 import EngageScreen2 from '../screens/starter/EngageScreen2';
 import EngageScreen3 from '../screens/starter/EngageScreen3';
+import MyDeliveryScreen from '../screens/delivery/MyDeliveryScreen';
 
 const Stack = createNativeStackNavigator();
 export default function StackNavigation() {
@@ -63,9 +64,14 @@ export default function StackNavigation() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
+        name="MyDeliveryScreen"
+        component={MyDeliveryScreen}
+        options={{ headerShown: true, title: "My Deliveries" }}
+      />
+      <Stack.Screen
         name="AddProductScreen"
         component={AddProductScreen}
-        options={{ headerShown: true, title: "Add Product" }}
+        options={{ headerShown: true, title: 'Add Product' }}
       />
       <Stack.Screen
         name="OrderDetailScreen"

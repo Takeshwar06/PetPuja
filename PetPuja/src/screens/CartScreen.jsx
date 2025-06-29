@@ -12,12 +12,17 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Minus, Plus, Trash2 } from 'lucide-react-native';
-import { Colors } from '../utils/Constants';
+import { Colors, companyLogo, companyName } from '../utils/Constants';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import axios from 'axios';
+import { host } from '../services/api';
+import RazorpayCheckout from 'react-native-razorpay';
+import FullLoader from '../components/FullLoader';
 
 export default function CartScreen() {
   const [cartItems, setCartItems] = useState([]);
   const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handlingCharges = 0;
   const deliveryCharges = 0;
@@ -76,12 +81,100 @@ export default function CartScreen() {
     return total + handlingCharges + deliveryCharges;
   };
 
-  const placeOrder = () => {
-    Alert.alert('Order Placed', 'Your order has been placed successfully!');
+  const placeOrder = async () => {
+    if (cartItems.length === 0) {
+      Alert.alert(
+        'Cart is empty',
+        'Please add items to your cart before placing an order.',
+      );
+      return;
+    }
+    setIsLoading(true);
+    const {
+      data: {
+        data: { key },
+      },
+    } = await axios.get(`${host}/api/v1/payments/get-key`);
+    console.log('key->', key);
+
+    const {
+      data: { data: order },
+    } = await axios.post(`${host}/api/v1/payments/order-gen`, {
+      amount: getTotal(), // Convert to paise
+    });
+    console.log('order->', order);
+
+    const options = {
+      key: key,
+      amount: order.amount,
+      currency: 'INR',
+      name: companyName,
+      description: 'Test Transaction',
+      image: companyLogo,
+      order_id: order.id,
+      prefill: {
+        name: `${companyName} User`,
+        email: `${companyName.toLowerCase()}@example.com`,
+        contact: (await AsyncStorage.getItem('user')) || '9999999999',
+      },
+      notes: {
+        address: 'Razorpay Corporate Office',
+      },
+      theme: {
+        color: Colors.primary,
+      },
+    };
+
+    RazorpayCheckout.open(options)
+      .then(async data => {
+        // handle success
+        setIsLoading(true);
+        const {
+          data: { data: paymentVerifyRes },
+        } = await axios.post(`${host}/api/v1/payments/verify`, {
+          razorpay_payment_id: data.razorpay_payment_id,
+          razorpay_order_id: data.razorpay_order_id,
+          razorpay_signature: data.razorpay_signature,
+        });
+        const response = await axios.post(`${host}/api/v1/orders`, {
+          items: cartItems,
+          totalAmount: getTotal(),
+          user: JSON.parse(await AsyncStorage.getItem('user')),
+          paymentId: paymentVerifyRes.razorpay_payment_id,
+        });
+        if (response.data.success) {
+          await AsyncStorage.removeItem('cart');
+          setCartItems([]);
+          Alert.alert('✅ Order Placed', 'Go to Orders to see details', [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'OK',
+              onPress: () =>
+                navigation.navigate('OrderDetailScreen', {
+                  order: response.data.data,
+                }),
+            },
+          ]);
+        }
+      })
+      .catch(error => {
+        // handle failure
+        console.log(error);
+        Alert.alert(
+          'Error',
+          error?.response?.data?.message || 'Payment failed',
+        );
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (
     <View style={styles.container}>
+      {isLoading && (
+        <FullLoader loading={isLoading} size="large" color={Colors.primary} />
+      )}
       <StatusBar backgroundColor={Colors.primary} barStyle={'light-content'} />
       <Text style={styles.header}>Your Cart</Text>
 
@@ -145,7 +238,7 @@ export default function CartScreen() {
             <Text style={styles.totalLabel}>Total</Text>
             <Text style={styles.totalValue}>₹{getTotal()}</Text>
           </View>
-          <TouchableOpacity style={styles.orderButton} onPress={placeOrder}>
+          <TouchableOpacity activeOpacity={0.8} style={styles.orderButton} onPress={placeOrder}>
             <Text style={styles.orderButtonText}>Place Order</Text>
           </TouchableOpacity>
         </View>

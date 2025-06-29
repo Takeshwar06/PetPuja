@@ -1,4 +1,5 @@
-export const Logo = "https://res.cloudinary.com/do3fiil0d/image/upload/v1751089486/foodimages/iihnkz6dmztvqrbaox0y.png";
+export const companyLogo = "https://res.cloudinary.com/do3fiil0d/image/upload/v1751089486/foodimages/iihnkz6dmztvqrbaox0y.png";
+export const companyName = "PetPuja";
 
 export const Colors = {
     primary: '#FF6B00',

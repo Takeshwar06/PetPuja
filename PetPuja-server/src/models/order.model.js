@@ -10,6 +10,10 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    paymentId: {
+      type: String,
+      required: true,
+    },
     status: {
       type: String,
       enum: ["pending", "accept", "complete", "reject"],
