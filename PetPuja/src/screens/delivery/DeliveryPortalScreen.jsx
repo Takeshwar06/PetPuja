@@ -18,24 +18,6 @@ import axios from 'axios';
 import { host } from '../../services/api';
 import FullLoader from '../../components/FullLoader';
 
-const dummyOrders = [
-  {
-    orderId: 'ORD123456',
-    date: '2025-06-28',
-    status: 'Pending',
-    totalAmount: '₹450',
-    items: 3,
-    userMobile: '9876543210',
-  },
-  {
-    orderId: 'ORD123457',
-    date: '2025-06-28',
-    status: 'Pending',
-    totalAmount: '₹320',
-    items: 2,
-    userMobile: '9123456780',
-  },
-];
 
 export default function DeliveryPortalScreen() {
   const navigation = useNavigation();

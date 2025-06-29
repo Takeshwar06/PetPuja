@@ -5,8 +5,8 @@ import { SwiperFlatList } from 'react-native-swiper-flatlist';
 const { width } = Dimensions.get('window');
 
 const bannerImages = [
-  require('../assets/images/slider1.jpg'),
-  require('../assets/images/slider1.jpg'),
+  require('../assets/images/slider2.jpg'),
+  require('../assets/images/slider3.jpg'),
   require('../assets/images/slider1.jpg'),
 ];
 
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   image: {
-    width: width - 24, 
+    width: width - 24,
     height: 200,
     borderRadius: 30,
     shadowColor: '#000',

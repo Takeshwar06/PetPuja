@@ -28,7 +28,7 @@ export default function DeliveryLoginScreen() {
       setLoading(true);
       const response = await axios.post(`${host}/api/v1/users/delivery-login`, {
         mobileNo: mobile,
-        password:"PetPuja@123",
+        password,
       });
       await AsyncStorage.setItem('deliveryPartner', mobile);
       navigation.reset({
@@ -37,7 +37,10 @@ export default function DeliveryLoginScreen() {
       });
     } catch (error) {
       console.log(error);
-      Alert.alert('Error', error?.response?.data?.message || 'Login failed. Please try again.');
+      Alert.alert(
+        'Error',
+        error?.response?.data?.message || 'Login failed. Please try again.',
+      );
     } finally {
       setLoading(false);
     }

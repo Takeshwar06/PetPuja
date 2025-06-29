@@ -32,6 +32,7 @@ export default function OrderDetailScreen() {
       setUser(await AsyncStorage.getItem('user'));
     })();
   }, []);
+  
   const fetchOrderDetails = async () => {
     setRefreshing(true);
     try {

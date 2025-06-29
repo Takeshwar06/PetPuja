@@ -9,6 +9,7 @@ import {
   Pressable,
   ScrollView,
   StatusBar,
+  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Bell, Search } from 'lucide-react-native';
@@ -19,17 +20,18 @@ import Products from '../components/Products';
 import BannerSlider from '../components/BannerSlider';
 
 const dummyCategories = [
-  { id: '1', name: 'Pizza', image: require('../assets/images/logo.png') },
-  { id: '2', name: 'Burger', image: require('../assets/images/logo.png') },
   { id: '3', name: 'Thali', image: require('../assets/images/logo.png') },
   { id: '4', name: 'Sweets', image: require('../assets/images/logo.png') },
+  { id: '5', name: 'South Indian', image: require('../assets/images/logo.png') },
   { id: '6', name: 'Drinks', image: require('../assets/images/logo.png') },
   { id: '7', name: 'Water', image: require('../assets/images/logo.png') },
   { id: '8', name: 'Cocacola', image: require('../assets/images/logo.png') },
-  { id: '9', name: 'Sprite', image: require('../assets/images/logo.png') },
-  { id: '10', name: 'Sprite', image: require('../assets/images/logo.png') },
-  { id: '11', name: 'Sprite', image: require('../assets/images/logo.png') },
-];
+  { id: '9', name: 'Chinese', image: require('../assets/images/logo.png') },
+  { id: '10', name: 'Ice Creams', image: require('../assets/images/logo.png') },
+  { id: '11', name: 'Snacks', image: require('../assets/images/logo.png') },
+  { id: '12', name: 'Combo Meals', image: require('../assets/images/logo.png') },
+]
+
 
 export default function HomeScreen() {
   const navigation = useNavigation();
@@ -50,10 +52,12 @@ export default function HomeScreen() {
   }, []);
 
   const renderCategory = ({ item }) => (
-    <View style={styles.categoryItem}>
+    <Pressable onPress={()=>{
+      Alert.alert("🔥 Coming Soon", "This feature is under development. Stay tuned! 😎");
+    }} style={styles.categoryItem}>
       <Image source={item.image} style={styles.categoryImage} />
       <Text style={styles.categoryText}>{item.name}</Text>
-    </View>
+    </Pressable>
   );
 
   return (
@@ -67,7 +71,7 @@ export default function HomeScreen() {
           <Text style={{ color: '#888' }}>Search for food...</Text>
           <Search size={18} color={'#888'} />
         </Pressable>
-        <TouchableOpacity activeOpacity={0.7}>
+        <TouchableOpacity onPress={()=>navigation.navigate("NotificationScreen")} activeOpacity={0.7}>
           <Bell color={'#fff'} size={25} />
         </TouchableOpacity>
       </View>
